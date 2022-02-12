@@ -119,8 +119,10 @@ function createFilters(){
             if(!allIngredientsArray.includes(ingredient.ingredient)){
                 allIngredientsArray.push(ingredient.ingredient)
                 let ingredientInFilter = document.createElement("li")
+                ingredientInFilter.setAttribute("data-type-value", ingredient.ingredient)
                 let ingredientInFilterLink = document.createElement("a")
-                ingredientInFilterLink.setAttribute("href", "javascript:;")
+                ingredientInFilterLink.setAttribute("href", "#")
+                ingredientInFilterLink.setAttribute("data-type", "ingredients")
                 ingredientInFilter.appendChild(ingredientInFilterLink)
                 ingredientInFilterLink.innerHTML += ingredient.ingredient
                 ingredientsFilterExpanded.appendChild(ingredientInFilter)
@@ -131,8 +133,10 @@ function createFilters(){
         if(!allAppliancesArray.includes(recipe.appliance)){
             allAppliancesArray.push(recipe.appliance)
             let applianceInFilter = document.createElement("li")
+            applianceInFilter.setAttribute("data-type-value", recipe.appliance)
             let applianceInFilterLink = document.createElement("a")
-            applianceInFilterLink.setAttribute("href", "javascript:;")
+            applianceInFilterLink.setAttribute("href", "#")
+            applianceInFilterLink.setAttribute("data-type", "devices")
             applianceInFilter.appendChild(applianceInFilterLink)
             applianceInFilterLink.innerHTML += recipe.appliance
             devicesFilterExpanded.appendChild(applianceInFilter)
@@ -145,8 +149,10 @@ function createFilters(){
             if(!allUtensilsArray.includes(ustensil)){
                 allUtensilsArray.push(ustensil)
                 let utensilInFilter = document.createElement("li")
+                utensilInFilter.setAttribute("data-type-value", ustensil)
                 let utensilInFilterLink = document.createElement("a")
-                utensilInFilterLink.setAttribute("href", "javascript:;")
+                utensilInFilterLink.setAttribute("href", "#")
+                utensilInFilterLink.setAttribute("data-type", "utensils")
                 utensilInFilter.appendChild(utensilInFilterLink)
                 utensilInFilterLink.innerHTML += ustensil
                 utensilsFilterExpanded.appendChild(utensilInFilter)

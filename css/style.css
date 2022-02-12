@@ -101,23 +101,23 @@ header a img{
     margin: 1rem 0;
 }
 
-.searchtags-wrapper a{
+.searchtags-wrapper div{
     display: flex;
     align-items: center;
     flex-direction: row;
-    color:var(--color-white);
+    color: var(--color-white);
     border-radius: var(--br-default);
     border: none;
     text-decoration: none;
     padding: .5rem 1rem;
 }
 
-.searchtags-wrapper a span{
+.searchtags-wrapper div span{
     padding: 0 .5rem 0 0;
     font-size: var(--fs-s);
 }
 
-.searchtags-wrapper a svg{
+.searchtags-wrapper div svg{
     fill: var(--color-white);
     margin-left: auto;
     width: 1rem;
@@ -285,6 +285,8 @@ article figure{
     line-height: 150%;
 }
 
-.recipe-hidden{
+.recipe-hidden,
+.element-hidden{
     display: none;
 }
+
