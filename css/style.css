@@ -218,6 +218,12 @@ main{
     padding: 0 2rem;
 }
 
+.no-recipe-match{
+    grid-column: 1 / span 3;
+    width: 100%;
+    text-align: center;
+}
+
 article figure{
     width: 100%;
     margin: 0;
@@ -283,6 +289,11 @@ article figure{
 .recipe-instructions p{
     font-size: var(--fs-s);
     line-height: 150%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 7;
+    -webkit-box-orient: vertical;
 }
 
 .recipe-hidden,

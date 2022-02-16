@@ -66,7 +66,9 @@ function createRecipe(){
         // Crée la liste des ingrédients
         let recipeIngredientsList = document.createElement("ul")
         let createIngredientsList = recipe.ingredients
+        let allRecipeIngredients = []
         createIngredientsList.forEach((ingredient) => {
+            allRecipeIngredients.push(ingredient.ingredient)
             //Crée la liste des ingrédients d'une recette
             let createIngredient = document.createElement("li")
             if(ingredient.quantity || ingredient.unit){
@@ -86,6 +88,9 @@ function createRecipe(){
             }
         })
         recipeIngredientsWrapper.appendChild(recipeIngredientsList)
+
+        // Ajoute tous les ingrédients de la recette dans data-ingredients
+        article.setAttribute("data-ingredients", allRecipeIngredients)
         
         //Crée les instructions de la recette
         let recipeInstructionsWrapper = document.createElement("div")
@@ -103,64 +108,20 @@ function createFilters(){
     let ingredientsFilterExpanded = document.querySelector(".searchfilter-contents.ingredients ul")
     let devicesFilterExpanded = document.querySelector(".searchfilter-contents.devices ul")
     let utensilsFilterExpanded = document.querySelector(".searchfilter-contents.utensils ul")
-
-    // Paramètres de la fonction de récupération des ingrédients pour servir la création:
-    // De la liste globale des ingrédients
     let allIngredientsArray = []
-    // De la liste globale des instruments
     let allAppliancesArray = []
-    // De la liste globale des ustensiles
     let allUtensilsArray = []
+    recipes.forEach(recipe => {
+        let populateGlobalIngredientsList = new Filters(recipe, ingredientsFilterExpanded, allIngredientsArray)
+        populateGlobalIngredientsList.ingredientsFilter()
 
-    recipes.forEach((recipe) =>{
-        recipe.ingredients.forEach((ingredient) => {
-            ingredient.ingredient = ingredient.ingredient.toLowerCase()
-            ingredient.ingredient = ingredient.ingredient.charAt(0).toUpperCase() + ingredient.ingredient.slice(1)
-            if(!allIngredientsArray.includes(ingredient.ingredient)){
-                allIngredientsArray.push(ingredient.ingredient)
-                let ingredientInFilter = document.createElement("li")
-                ingredientInFilter.setAttribute("data-type-value", ingredient.ingredient)
-                let ingredientInFilterLink = document.createElement("a")
-                ingredientInFilterLink.setAttribute("href", "#")
-                ingredientInFilterLink.setAttribute("data-type", "ingredients")
-                ingredientInFilter.appendChild(ingredientInFilterLink)
-                ingredientInFilterLink.innerHTML += ingredient.ingredient
-                ingredientsFilterExpanded.appendChild(ingredientInFilter)
-            }
-        })
-        recipe.appliance = recipe.appliance.toLowerCase()
-        recipe.appliance = recipe.appliance.charAt(0).toUpperCase() + recipe.appliance.slice(1)
-        if(!allAppliancesArray.includes(recipe.appliance)){
-            allAppliancesArray.push(recipe.appliance)
-            let applianceInFilter = document.createElement("li")
-            applianceInFilter.setAttribute("data-type-value", recipe.appliance)
-            let applianceInFilterLink = document.createElement("a")
-            applianceInFilterLink.setAttribute("href", "#")
-            applianceInFilterLink.setAttribute("data-type", "devices")
-            applianceInFilter.appendChild(applianceInFilterLink)
-            applianceInFilterLink.innerHTML += recipe.appliance
-            devicesFilterExpanded.appendChild(applianceInFilter)
-        }
+        let populateGlobalDevicesList = new Filters(recipe, devicesFilterExpanded, allAppliancesArray)
+        populateGlobalDevicesList.devicesFilter()
 
+        let populateGlobalUtensilsList = new Filters(recipe, utensilsFilterExpanded, allUtensilsArray)
+        populateGlobalUtensilsList.utensilsFilter()
         
-        recipe.ustensils.forEach((ustensil) => {
-            ustensil = ustensil.toLowerCase()
-            ustensil = ustensil.charAt(0).toUpperCase() + ustensil.slice(1)
-            if(!allUtensilsArray.includes(ustensil)){
-                allUtensilsArray.push(ustensil)
-                let utensilInFilter = document.createElement("li")
-                utensilInFilter.setAttribute("data-type-value", ustensil)
-                let utensilInFilterLink = document.createElement("a")
-                utensilInFilterLink.setAttribute("href", "#")
-                utensilInFilterLink.setAttribute("data-type", "utensils")
-                utensilInFilter.appendChild(utensilInFilterLink)
-                utensilInFilterLink.innerHTML += ustensil
-                utensilsFilterExpanded.appendChild(utensilInFilter)
-            }
-        })
     })
-
-    // console.log(allIngredientsArray)
 }
 
 
