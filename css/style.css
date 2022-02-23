@@ -117,11 +117,17 @@ header a img{
     font-size: var(--fs-s);
 }
 
-.searchtags-wrapper div svg{
-    fill: var(--color-white);
+.searchtags-wrapper a{
+    display: block;
     margin-left: auto;
     width: 1rem;
     height: 1rem;
+}
+
+.searchtags-wrapper a svg{
+    fill: var(--color-white);
+    width: 100%;
+    height: auto;
 }
 
 .searchfilters-wrapper{
@@ -215,7 +221,8 @@ main{
     grid-template-columns: 1fr 1fr 1fr;
     column-gap: 1rem;
     row-gap: 1rem;
-    padding: 0 2rem;
+    padding: 0 2rem 2rem 2rem;
+    width: 100%;
 }
 
 .no-recipe-match{

@@ -1,134 +1,154 @@
-function searchRecipe(event) {
+function getUserInput(event) {
     event.preventDefault()
     let searchedValue = document.querySelector("#search-recipe").value.toLowerCase()
     
-    console.log(searchedValue)
-    
-    if(searchedValue.length < 3) {
+    if(searchedValue.length >= 3) {
+        filterRecipes(searchedValue)
     }else{
-        let foundItems = [] 
-    
-        // PARAMETRES DE LA RECHERCHE
-        // CRÉE UN ARRAY DE TOUS LES INGREDIENTS
-        for(let i = 0; i < recipes.length; i++){
-            // Tous les ingrédients parmi toutes les recettes
-            let recipeIngredientsArray = []
-            for(j = 0; j < recipes[i].ingredients.length; j++){
-                recipeIngredientsArray.push(recipes[i].ingredients[j].ingredient.toLowerCase())
-            }
-
-            /// Tous les noms de recettes
-            let getRecipeName = recipes[i].name.toLowerCase()
-            // Toutes les descriptions des recettes
-            let getRecipeDesc = recipes[i].description.toLowerCase()
-            
-            // RECHERCHE
-            // Cherche dans les noms / description et ingrédients si l'input match
-            if(getRecipeName.includes(searchedValue)){
-                // Crée un array des matchs
-                foundItems.push(recipes[i])
-            }else{
-                if(getRecipeDesc.includes(searchedValue)){
-                    foundItems.push(recipes[i])
-                }else{
-                    if(recipeIngredientsArray.includes(searchedValue)){
-                        foundItems.push(recipes[i])
-                    }
-                }
-            }
-        }
-        
-        if(foundItems.length != 0){
-            console.log("trouvé des recettes: ", foundItems)
-            // document.querySelector(".no-recipe-match").classList.remove("element-hidden")
-        }else{
-            console.log("pas trouvé des recettes: ", foundItems)
-            // document.querySelector(".no-recipe-match").classList.add("element-hidden")
-            // MESSAGE DE PAS DE RECETTES TROUVÉES
-        }
-        updateFilters(foundItems)
-        showHideResultItem(foundItems)
+        let searchedValue = ""
+        filterRecipes(searchedValue)
     }
-    
 }
 
-function updateFilters(foundItems){
+function filterRecipes(searchedValue){
+    // Récupère les tags actifs s'il y en a
+    let activeTags = document.querySelectorAll(".searchtags-wrapper div span")
+    let allActiveTags = []
+    if(activeTags.length != 0){
+        activeTags.forEach(activeTag =>{
+            allActiveTags.push(activeTag.innerText.toLowerCase())
+        })
+    }
+    
+    let filteredRecipes = []
+    
+    // Récupère toutes les infos des recettes trouvées
+    recipes.forEach(recipe =>{
+        // Les ingrédients
+        let recipeIngredients = []
+        recipe.ingredients.forEach(ingredient => {
+            recipeIngredients.push(ingredient.ingredient.toLowerCase())
+        })
+        // Les devices
+        let recipeAppliance = recipe.appliance.toLowerCase()
+        // Les ustensils
+        let recipeUtensils = []
+        recipe.ustensils.forEach(utensil =>{
+            recipeUtensils.push(utensil.toLowerCase())
+        })
+        let allMetaToFilter = [].concat(recipeIngredients, recipeAppliance, recipeUtensils)
+        let allOtherComps = [].concat(recipe.name.toLowerCase(), recipe.description.toLowerCase())
+
+        // Regarde si les tags sont contenus dans les ingrédients/devices/ustensils
+        let allTagsContained = allActiveTags.every(tag =>{
+            return allMetaToFilter.includes(tag)
+        })
+        
+        // Regarde si la valeur recherchée est dans le nom ou la description 
+        let searchedValueContained = allOtherComps.some(otherComp =>{
+            return otherComp.includes(searchedValue)
+        })
+
+        // Si des tags sont actifs
+        if(allActiveTags.length != 0){
+            // Si tous les tags sont contenus dans la recette
+            if(allTagsContained){
+                // Si la recherche est superieure a 3 caractères
+                if(searchedValue.length >= 3){
+                    if(searchedValueContained){
+                        filteredRecipes.push(recipe)
+                    }else{
+                        
+                    }
+                }else{
+                    filteredRecipes.push(recipe)
+                    // Affiche la recette / Ajoute la recette à recipes
+                }
+            }else{
+                // Cache la recette
+            }
+        }else{
+            if(searchedValue.length >= 3){
+                if(searchedValueContained){
+                    filteredRecipes.push(recipe)
+                }else{
+                    
+                }
+            }else{
+                filteredRecipes.push(recipe)
+                // Affiche la recette / Ajoute la recette à recipes
+            }
+        }
+    })
+
+    // Si aucune recette n'a été trouvée
+    if(filteredRecipes.length == 0){
+        document.querySelector(".no-recipe-match").classList.remove("element-hidden")
+        // Cache toutes les recettes
+        document.querySelectorAll("article").forEach(article =>{
+            article.classList.add("recipe-hidden")
+        })
+    }else{
+        document.querySelector(".no-recipe-match").classList.add("element-hidden")
+        updateFilters(filteredRecipes)
+        showHideResultItem(filteredRecipes)
+    }
+}
+
+function updateFilters(filteredRecipes){
+    // Vide le contenu des filtres
     let allFiltersContainers = document.querySelectorAll(".searchfilter-contents ul")
     allFiltersContainers.forEach(filterContainer =>{
         filterContainer.innerHTML = ""
     })
 
+    // Génère les ingrédients/devices/ustensiles des recettes trouvées
     let filtersIngredientsContainer = document.querySelector(".searchfilter-contents.ingredients ul")
     let filtersDevicesContainer = document.querySelector(".searchfilter-contents.devices ul")
     let filtersUtensilsContainer = document.querySelector(".searchfilter-contents.utensils ul")
     let allIngredientsArray = []
     let allAppliancesArray = []
     let allUtensilsArray = []
-    foundItems.forEach(foundRecipe =>{
-        let updateIngredientsFilter = new Filters(foundRecipe, filtersIngredientsContainer, allIngredientsArray)
+    filteredRecipes.forEach(filteredRecipe =>{
+        let updateIngredientsFilter = new Filters(filteredRecipe, filtersIngredientsContainer, allIngredientsArray)
         updateIngredientsFilter.ingredientsFilter()
 
-        let updateDevicesFilter = new Filters(foundRecipe, filtersDevicesContainer, allAppliancesArray)
+        let updateDevicesFilter = new Filters(filteredRecipe, filtersDevicesContainer, allAppliancesArray)
         updateDevicesFilter.devicesFilter()
 
-        let updateUtensilsFilter = new Filters(foundRecipe, filtersUtensilsContainer, allUtensilsArray)
+        let updateUtensilsFilter = new Filters(filteredRecipe, filtersUtensilsContainer, allUtensilsArray)
         updateUtensilsFilter.utensilsFilter()
     })
 }
 
-function showHideResultItem(foundItems){
-    
+function showHideResultItem(filteredRecipes){
+    // Cache toutes les recettes
     document.querySelectorAll("article").forEach(article =>{
         article.classList.add("recipe-hidden")
     })
-    foundItems.forEach((foundItem) =>{
-        document.querySelector("[data-id='" + foundItem.id +"']").classList.remove("recipe-hidden")
-    })
-
-    let checkActiveRecipes = document.querySelectorAll("article:not(.recipe-hidden)")
-    if(checkActiveRecipes.length == 0){
-        document.querySelector(".no-recipe-match").classList.remove("element-hidden")
-    }else{
-        document.querySelector(".no-recipe-match").classList.add("element-hidden")
-    }
-}
-
-function checkActiveTags(){
-    // Récupère les tags actifs s'il y en a
-    let activeTags = document.querySelectorAll(".searchtags-wrapper div span")
-    let allActiveTags = []
-    activeTags.forEach(activeTag =>{
-        allActiveTags.push(activeTag.innerText.toLowerCase())
-    })
-    
-    // Récupère toutes les méta des recettes
-    let activeRecipes = document.querySelectorAll("article")
-    activeRecipes.forEach(activeRecipe =>{
-        let recipeIngredients = activeRecipe.getAttribute("data-ingredients")
-        let recipeAppliance = activeRecipe.getAttribute("data-appliance")
-        let recipeUtensils = activeRecipe.getAttribute("data-utensils")
-        let activeRecipeIngredientsArray = recipeIngredients.toLowerCase().split(",")
-        let activeRecipeUtensilsArray = recipeUtensils.toLowerCase().split(",")
-        let allMetaToFilter = [].concat(activeRecipeIngredientsArray, recipeAppliance, activeRecipeUtensilsArray)
-
-        if(allActiveTags.length != 0){
-            filterByActiveTag(allActiveTags, activeRecipe, allMetaToFilter)
-        }else{
-            activeRecipe.classList.remove("recipe-hidden")
-        }
+    // Affiche les recettes trouvées
+    filteredRecipes.forEach((filteredRecipe) =>{
+        document.querySelector("[data-id='" + filteredRecipe.id +"']").classList.remove("recipe-hidden")
     })
 }
 
-function filterByActiveTag(allActiveTags, activeRecipe, allMetaToFilter){
-    let allTagsContained = allActiveTags.every(tag =>{
-        return allMetaToFilter.includes(tag)
-    })
+function createNewTag(clickedTag){
+    let clickedFilterElementText = clickedTag.text
+    let clickedFilterElementType = clickedTag.getAttribute("data-type")
+    let tagsContainer = document.querySelector(".searchtags-wrapper")
+    // Invoque la classe pour créer l'élément
+    let createTag = new Tags(clickedFilterElementText, clickedFilterElementType, tagsContainer)
+        createTag.createTag()
 
-    if(allTagsContained){
-        activeRecipe.classList.remove("recipe-hidden")
-    }else{
-        activeRecipe.classList.add("recipe-hidden")
-    }
+    let searchedValue = document.querySelector("#search-recipe").value.toLowerCase()
+    filterRecipes(searchedValue)
+}
+
+function removeClickedTag(clickedTag){
+    clickedTag.parentNode.remove()
+
+    let searchedValue = document.querySelector("#search-recipe").value.toLowerCase()
+    filterRecipes(searchedValue)
 }
 
 
@@ -173,38 +193,4 @@ function searchInFilters(targetFilterArray, inputValue){
             elementInFilterArray.parentElement.classList.remove("element-hidden")
         }
     }
-}
-
-function createNewTag(clickedTag){
-    let clickedFilterElementText = clickedTag.text
-    let clickedFilterElementType = clickedTag.getAttribute("data-type")
-
-    let tagsContainer = document.querySelector(".searchtags-wrapper")
-    let createNewTag = document.createElement("div")
-    let createNewTagTextWrapper = document.createElement("span")
-    createNewTag.setAttribute("class", clickedFilterElementType)
-    createNewTagTextWrapper.innerHTML = clickedFilterElementText
-    createNewTag.appendChild(createNewTagTextWrapper)
-
-    let svgLinkWrapper = document.createElement("a")
-    svgLinkWrapper.setAttribute("href", "#")
-    svgLinkWrapper.setAttribute("onClick", "removeclickedTag(this)")
-    let tagRemoveSVG = document.createElementNS("http://www.w3.org/2000/svg", "svg")
-    tagRemoveSVG.setAttribute("width", "24")
-    tagRemoveSVG.setAttribute("height", "24")
-    tagRemoveSVG.setAttribute("viewBox", "0 0 24 24")
-    let tagRemoveSVGPath = document.createElementNS("http://www.w3.org/2000/svg", "path")
-    tagRemoveSVGPath.setAttribute("d", "M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6 16.538l-4.592-4.548 4.546-4.587-1.416-1.403-4.545 4.589-4.588-4.543-1.405 1.405 4.593 4.552-4.547 4.592 1.405 1.405 4.555-4.596 4.591 4.55 1.403-1.416z");
-    tagRemoveSVG.appendChild(tagRemoveSVGPath)
-    svgLinkWrapper.appendChild(tagRemoveSVG)
-    createNewTag.appendChild(svgLinkWrapper)
-
-    tagsContainer.appendChild(createNewTag)
-
-    checkActiveTags()
-}
-
-function removeclickedTag(clickedTag){
-    clickedTag.parentNode.remove()
-    checkActiveTags()
 }
