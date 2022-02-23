@@ -15,39 +15,69 @@ function filterRecipes(searchedValue){
     let activeTags = document.querySelectorAll(".searchtags-wrapper div span")
     let allActiveTags = []
     if(activeTags.length != 0){
-        activeTags.forEach(activeTag =>{
-            allActiveTags.push(activeTag.innerText.toLowerCase())
-        })
+        for(i = 0; i < activeTags.length; i++){
+            allActiveTags.push(activeTags[i].innerText.toLowerCase())
+        }
     }
     
     let filteredRecipes = []
-    
-    // Récupère toutes les infos des recettes trouvées
-    recipes.forEach(recipe =>{
-        // Les ingrédients
+
+    for(j = 0; j < recipes.length; j++){
+
+        // Liste les ingrédients de la recette
         let recipeIngredients = []
-        recipe.ingredients.forEach(ingredient => {
-            recipeIngredients.push(ingredient.ingredient.toLowerCase())
-        })
+        for(k = 0; k < recipes[j].ingredients.length; k++){
+            recipeIngredients.push(recipes[j].ingredients[k].ingredient.toLowerCase())
+        }
+
         // Les devices
-        let recipeAppliance = recipe.appliance.toLowerCase()
+        let recipeAppliance = recipes[j].appliance.toLowerCase()
+
         // Les ustensils
         let recipeUtensils = []
-        recipe.ustensils.forEach(utensil =>{
-            recipeUtensils.push(utensil.toLowerCase())
-        })
+        for(l = 0; l < recipes[j].ustensils.length; l++){
+            recipeUtensils.push(recipes[j].ustensils[l].toLowerCase())
+        }
+
         let allMetaToFilter = [].concat(recipeIngredients, recipeAppliance, recipeUtensils)
-        let allOtherComps = [].concat(recipe.name.toLowerCase(), recipe.description.toLowerCase())
+        let allOtherComps = [].concat(recipes[j].name.toLowerCase(), recipes[j].description.toLowerCase())
 
         // Regarde si les tags sont contenus dans les ingrédients/devices/ustensils
-        let allTagsContained = allActiveTags.every(tag =>{
-            return allMetaToFilter.includes(tag)
-        })
+        let allTagsContained = []
+        // console.log(allActiveTags)
+        // console.log(allMetaToFilter)
+        if(allActiveTags.length != 0){
+            for(m = 0; m < allActiveTags.length; m++){
+                // console.log(allMetaToFilter)
+                if(allMetaToFilter.includes(allActiveTags[m])){
+                    allTagsContained.push(true)
+                }else{
+                    allTagsContained.push(false)
+                }
+            }
+            console.log(allTagsContained)
+            if(allTagsContained.includes(false)){
+                allTagsContained = false
+            }else{
+                allTagsContained = true
+            }
+        }
         
+
         // Regarde si la valeur recherchée est dans le nom ou la description 
-        let searchedValueContained = allOtherComps.some(otherComp =>{
-            return otherComp.includes(searchedValue)
-        })
+        let searchedValueContained = []
+        for(n = 0; n < allOtherComps.length; n++){
+            if(allOtherComps[n].includes(searchedValue)){
+                searchedValueContained.push(true)
+            }else{
+                searchedValueContained.push(false)
+            }
+        }
+        if(searchedValueContained.includes(true)){
+            searchedValueContained = true
+        }else{
+            searchedValueContained = false
+        }
 
         // Si des tags sont actifs
         if(allActiveTags.length != 0){
@@ -56,30 +86,33 @@ function filterRecipes(searchedValue){
                 // Si la recherche est superieure a 3 caractères
                 if(searchedValue.length >= 3){
                     if(searchedValueContained){
-                        filteredRecipes.push(recipe)
+                        filteredRecipes.push(recipes[j])
                     }else{
                         
                     }
                 }else{
-                    filteredRecipes.push(recipe)
+                    filteredRecipes.push(recipes[j])
                     // Affiche la recette / Ajoute la recette à recipes
                 }
             }else{
                 // Cache la recette
             }
         }else{
+            // console.log(searchedValueContained)
             if(searchedValue.length >= 3){
                 if(searchedValueContained){
-                    filteredRecipes.push(recipe)
+                    filteredRecipes.push(recipes[j])
                 }else{
                     
                 }
             }else{
-                filteredRecipes.push(recipe)
+                filteredRecipes.push(recipes[j])
                 // Affiche la recette / Ajoute la recette à recipes
             }
         }
-    })
+    }
+
+    // console.log(filteredRecipes)
 
     // Si aucune recette n'a été trouvée
     if(filteredRecipes.length == 0){
